@@ -1,8 +1,6 @@
-<<<<<<< HEAD
 .idea
 .node_modules
 .dist
-=======
 # Logs
 logs
 *.log

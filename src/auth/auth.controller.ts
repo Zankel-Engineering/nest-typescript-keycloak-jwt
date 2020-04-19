@@ -1,22 +1,19 @@
-import { Body, Controller, Get, Post, Req, Session } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { TokenSet } from 'openid-client';
 import { RefreshCookiePayload } from './refresh-cookie-payload.interface';
 import { AuthResponse } from './auth-response';
 import { ApiOkResponse } from '@nestjs/swagger';
-import { CookieOptions, Cookies } from '@nestjsplus/cookies';
-
-interface AuthRequestPayload {
-  username: string;
-  password: string;
-}
+import { Cookies, CookieSettings } from '@nestjsplus/cookies';
+import { AuthRequestPayloadDto } from './dto/auth-request-payload.dto';
+import * as moment from 'moment';
 
 interface UdcCookies {
   udcAuthorization: string;
 }
 
 interface InterestingPartRequest {
-  _cookies: Array<{name: keyof UdcCookies, value: string, options: CookieOptions}>
+  _cookies: CookieSettings[];
 }
 
 @Controller('auth')
@@ -27,7 +24,7 @@ export class AuthController {
   /** Get access token payload with credentials */
   @Post('token')
   @ApiOkResponse({description: 'Get access token payload with credentials'})
-  public async getTokenGrant(@Body() authPayload: AuthRequestPayload, @Req() request: InterestingPartRequest): Promise<AuthResponse> {
+  public async getTokenGrant(@Body() authPayload: AuthRequestPayloadDto, @Req() request: InterestingPartRequest): Promise<AuthResponse> {
     const keycloakResponse: TokenSet = await this.authService.queryKeycloakWithCredentials(authPayload.username, authPayload.password);
     const refreshCookiePayload: RefreshCookiePayload = {refresh_token: keycloakResponse.refresh_token, expires_in: keycloakResponse.expires_in};
     this.setRefreshTokenPayloadOnRequest(request, refreshCookiePayload);
@@ -51,7 +48,7 @@ export class AuthController {
       options: {
         httpOnly: true,
         sameSite: false,
-        expires: new Date(refreshCookiePayload.expires_in * 1000),
+        expires: moment.unix(AuthService.getRefreshTokenExpires(refreshCookiePayload.refresh_token)).toDate(),
       },
     }];
   }

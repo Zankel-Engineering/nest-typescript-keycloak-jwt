@@ -10,5 +10,10 @@ import { LoggerMiddleware } from '../core/middleware/logger.middleware';
   exports: [AuthService],
 })
 export class AuthModule {
-
+  public configure(consumer: MiddlewareConsumer): void {
+      consumer.apply(LoggerMiddleware).forRoutes({
+        path: '*',
+        method: RequestMethod.ALL,
+      });
+    }
 }

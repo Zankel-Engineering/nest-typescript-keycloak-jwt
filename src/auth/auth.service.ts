@@ -1,7 +1,7 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, UnauthorizedException } from '@nestjs/common';
 import { Client, Issuer, TokenSet } from 'openid-client';
-import { token } from 'morgan';
 import { AuthResponse } from './auth-response';
+import * as jwt_decode from 'jwt-decode';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -20,9 +20,10 @@ export class AuthService implements OnModuleInit {
 
     /** @inheritDoc */
     public async onModuleInit(): Promise<void> {
-        const keycloakIssuer: Issuer<Client> = await Issuer.discover(process.env.KEYCLOAK_ISSUER || 'https://auth.untergrunddating.club/auth/realms/udc');
+        const keycloakIssuer: Issuer<Client> = await Issuer.discover(process.env.KEYCLOAK_ISSUER);
         this.client = new keycloakIssuer.Client({
-            client_id: process.env.KEYCLOAK_CLIENT_ID || '60-30', // Same as `clientId` passed to client.auth()
+            client_id: process.env.KEYCLOAK_CLIENT_ID, // Same as `clientId` passed to client.auth()
+            client_secret: process.env.KEYCLOAK_SECRET,
         });
     }
 
@@ -36,7 +37,9 @@ export class AuthService implements OnModuleInit {
                 password,
             });
         } catch (e) {
-            Logger.error('There was error granting access to a user', e.toString(), AuthService.name, true);
+            const errorMessage = 'There was error granting access to a user';
+            Logger.error(errorMessage, e.toString(), AuthService.name, true);
+            throw new UnauthorizedException(errorMessage);
         }
         return tokenSet;
     }
@@ -47,9 +50,17 @@ export class AuthService implements OnModuleInit {
         try {
             tokenSet = await this.client.refresh(refreshToken);
         } catch (e) {
-            Logger.error('There was an error trying to refresh a token', e.toString(), AuthService.name, true);
+            const errorMessage = 'There was an error trying to refresh a token';
+            Logger.error(errorMessage, e.toString(), AuthService.name, true);
+            throw new UnauthorizedException(errorMessage);
         }
         return tokenSet;
+    }
+
+    /** Gets the refresh tokens expires */
+    public static getRefreshTokenExpires(refreshToken: string): number {
+        const decodedToken = jwt_decode(refreshToken);
+        return decodedToken.exp;
     }
 
 }

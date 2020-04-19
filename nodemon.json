@@ -4,7 +4,8 @@
   "ignore": ["src/**/*.spec.ts"],
   "exec": "ts-node -r tsconfig-paths/register src/main.ts",
   "env": {
-    "KEYCLOAK_ISSUER": "'https://auth.untergrunddating.club/auth/realms/udc'",
-    "KEYCLOAK_CLIENT_ID": "60-30"
+    "KEYCLOAK_ISSUER": "https://auth.untergrunddating.club/auth/realms/udc",
+    "KEYCLOAK_CLIENT_ID": "60-30",
+    "KEYCLOAK_SECRET": "152d61d2-a1d6-4dc7-9f8f-baec9b4ce058"
   }
 }
