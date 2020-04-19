@@ -1,0 +1,10 @@
+{
+  "watch": ["src"],
+  "ext": "ts",
+  "ignore": ["src/**/*.spec.ts"],
+  "exec": "ts-node -r tsconfig-paths/register src/main.ts",
+  "env": {
+    "KEYCLOAK_ISSUER": "'https://auth.untergrunddating.club/auth/realms/udc'",
+    "KEYCLOAK_CLIENT_ID": "60-30"
+  }
+}
