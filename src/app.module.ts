@@ -6,7 +6,12 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     TerminusModule.forRootAsync({
-      useClass: TerminusOptionsService,
+      useFactory: () => ({
+        disableDeprecationWarnings: true,
+        endpoints: [
+          // ...
+        ],
+      }),
     }),
     AuthModule,
   ],
