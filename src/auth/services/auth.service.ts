@@ -1,13 +1,14 @@
 import { Injectable, Logger, OnModuleInit, UnauthorizedException } from '@nestjs/common';
 import { Client, Issuer, TokenSet } from 'openid-client';
-import { AuthResponse } from './auth-response';
+import { AuthResponseDto } from '../dto/auth-response-dto';
 import * as jwt_decode from 'jwt-decode';
+import { RefreshCookiePayload } from '../interfaces/refresh-cookie-payload.interface';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
 
     /** Mapper for keycloak response to auth response */
-    public static mapKeycloakResponseToAuthResponse(keycloakResponse: TokenSet): AuthResponse {
+    public static mapKeycloakResponseToAuthResponse(keycloakResponse: TokenSet): AuthResponseDto {
         return {
             access_token: keycloakResponse.access_token,
             expires_in: keycloakResponse.expires_at,
@@ -45,10 +46,10 @@ export class AuthService implements OnModuleInit {
     }
 
     /** Refresh the token */
-    public async queryKeycloakWithRefreshToken(refreshToken: string): Promise<TokenSet> {
+    public async queryKeycloakWithRefreshToken(refreshCookiePayload: RefreshCookiePayload): Promise<TokenSet> {
         let tokenSet;
         try {
-            tokenSet = await this.client.refresh(refreshToken);
+            tokenSet = await this.client.refresh(refreshCookiePayload.refresh_token);
         } catch (e) {
             const errorMessage = 'There was an error trying to refresh a token';
             Logger.error(errorMessage, e.toString(), AuthService.name, true);
@@ -58,7 +59,7 @@ export class AuthService implements OnModuleInit {
     }
 
     /** Gets the refresh tokens expires */
-    public static getRefreshTokenExpires(refreshToken: string): number {
+    public static getRefreshTokenExpires(refreshToken: string | undefined): number {
         const decodedToken = jwt_decode(refreshToken);
         return decodedToken.exp;
     }

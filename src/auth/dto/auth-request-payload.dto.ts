@@ -2,11 +2,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty } from 'class-validator';
 
 export class AuthRequestPayloadDto {
-    @ApiProperty()
+    @ApiProperty({example: 'test@test.de', required: true})
     @IsNotEmpty()
     @IsEmail()
-    public username: string;
+    public username!: string;
     @IsNotEmpty()
-    @ApiProperty()
-    public password: string;
+    @ApiProperty({example: 'test123', required: true})
+    public password!: string;
 }

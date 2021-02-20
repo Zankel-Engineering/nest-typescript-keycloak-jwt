@@ -1,7 +1,7 @@
 {
-  "name": "nest-typescript-starter",
+  "name": "nest-typescript-keycloak-jwt",
   "version": "1.0.0",
-  "description": "Nest TypeScript starter repository",
+  "description": "An abstraction for keycloak jwt communication using nest.js",
   "license": "MIT",
   "scripts": {
     "build": " if [ -d \"dist\" ]; then rm -Rf dist; fi && tsc -p tsconfig.build.json",
@@ -18,7 +18,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "build-run": "npm run build && node ./dist/main.js"
   },
   "dependencies": {
     "@godaddy/terminus": "^4.3.1",

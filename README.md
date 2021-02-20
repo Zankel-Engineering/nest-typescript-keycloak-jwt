@@ -1,4 +1,5 @@
-This is a [Nest Js](https://github.com/nestjs/nest) project configured for Docker
+This is a [Nest Js](https://github.com/nestjs/nest) project configured for Docker. It abstracts JWT communication
+with a Keycloak SSO server and stores the refresh token securely in a http only cookie.
 
 ## Installation
 
